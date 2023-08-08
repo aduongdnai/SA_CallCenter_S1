@@ -1,24 +1,33 @@
-import logo from './logo.svg';
 import './App.css';
+import InputInformation from './feattures/InpuInformation';
+import ResponsiveAppBar from './components/header';
+import { Route, Routes, BrowserRouter} from 'react-router-dom'
+import connectDB from './utils/db.js'
+import callAPI from './api/callAPI';
+import { useEffect } from 'react';
 
 function App() {
+  useEffect(()=>{
+    const fetchCalls = async () =>{
+      const calls= await  callAPI.getAll()
+      console.log(calls);
+    }
+    fetchCalls()
+  })
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+        <ResponsiveAppBar></ResponsiveAppBar>
+        
+          <Routes>
+            
+            <Route path="/" Component={InputInformation}/>
+            
+          </Routes>
+        
+          
+        
+    </BrowserRouter>
   );
 }
 
