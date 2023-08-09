@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Route, Routes } from 'react-router-dom';
 import Select from 'react-select'
 import PhoneNumberField from '../../components/form-controls/PhoneNumberField';
 import InputTextField from '../../components/form-controls/InputTextField';
-import { Box, Button, MenuItem,InputLabel, FormControl} from '@mui/material';
+import { Button} from '@mui/material';
 import {useForm, Controller} from 'react-hook-form'
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
 import callAPI from '../../api/callAPI';
+import * as mqtt from 'mqtt'
 
 
 class CallDTO  {
@@ -29,6 +29,7 @@ function InputInformation(props) {
     const options = [
         { value: '1', label: 'Xe hơi' },
         { value: '2', label: 'Xe máy' },
+        { value:'',   label:'None'}
         
       ]
     const schema = yup
@@ -37,6 +38,10 @@ function InputInformation(props) {
         .matches(/^(?:\+?84|0)(?:1\d{9}|3\d{8}|5\d{8}|7\d{8}|8\d{8}|9\d{8})$/, 'Invalid phone number'),
         name:  yup.string().required('Customer name is required').min(4, "At least 4 character"),
         pickup_address:  yup.string().required('Address is required').min(4, "At least 4 character"),
+        car_type: yup.object({
+            value: yup.string().required("Please select a vehicle"),
+         }),
+        
     
     })
     const form=useForm({
@@ -44,22 +49,97 @@ function InputInformation(props) {
             phone_number:"0100000000",
             name:"",
             pickup_address:"",
+            car_type:""
 
         },
         resolver:yupResolver(schema)
     })
-    const { register, handleSubmit, watch, formState: { errors } ,control} = form;
-    const onSubmit = (data) =>{ 
+    const { register, handleSubmit, watch, formState: { errors,touchedFields } ,control} = form;
+   
+    //connect mqtt broker
+    const [client, setClient] = useState(null)
+    const [isSubed, setIsSub] = useState(false)
+    const [payload, setPayload] = useState({})
+    const [connectStatus, setConnectStatus] = useState('Connect')
+    const mqttConnect = (host, mqttOption) => {
+        setConnectStatus('Connecting');
+        setClient(mqtt.connect(host, mqttOption));
+        console.log(client);
+      };
+      useEffect(() => {
+        
+        if (client) {
+           
+          client.on('connect', () => {
+            setConnectStatus('Connected');
+          });
+          client.on('error', (err) => {
+            console.error('Connection error: ', err);
+            client.end();
+          });
+          client.on('reconnect', () => {
+            setConnectStatus('Reconnecting');
+          });
+          client.on('message', (topic, message) => {
+            const payload = { topic, message: message.toString() };
+            setPayload(payload);
+          });
+        }
+      }, [client]);
+      const initialConnectionOptions = {
+        // ws or wss
+        protocol: 'ws',
+        host: 'broker.emqx.io',
+        clientId: 'emqx_react_' + Math.random().toString(16).substring(2, 8),
+        // ws -> 8083; wss -> 8084
+        port: 8083,
+        /**
+         * By default, EMQX allows clients to connect without authentication.
+         * https://docs.emqx.com/en/enterprise/v4.4/advanced/auth.html#anonymous-login
+         */
+        username: 'emqx_test',
+        password: 'emqx_test',
+      }
+      
+      const mqttPublish = (context) => {
+        if (client) {
+        console.log(context);
+          const { topic, qos, payload } = context;
+          client.publish(topic, payload, { qos }, error => {
+            if (error) {
+              console.log('Publish error: ', error);
+            }
+          });
+        }
+      }
+      const mqttDisconnect = () => {
+        if (client) {
+          client.end(() => {
+            setConnectStatus('Connect');
+          });
+        }
+      }
+      const onSubmit = (data) =>{ 
         const car_type=data.car_type
         data.car_type=car_type.value
         const curDate=new Date()
         data.time=curDate.toISOString()
         console.log(data);
         
-        const call=new CallDTO(data.name,data.phone_number,data.pickup_address,data.car_type,data.time)
-        callAPI.add(call)
+        //const call=new CallDTO(data.name,data.phone_number,data.pickup_address,data.car_type,data.time)
+        // callAPI.add(call)
+        mqttConnect('ws://broker.emqx.io:8083/mqtt',initialConnectionOptions)
+        
+        const publishContent={
+            topic:'testtopic/react',
+            qos:0,
+            payload: data.phone_number
+          }
+          setTimeout(mqttPublish, 1500,publishContent);
+          setTimeout(mqttDisconnect, 2000);
+        
     }
-    
+    let SelectHasError=errors['car_type'] && touchedFields['car_type']
     return (
        
         <div>
@@ -71,7 +151,10 @@ function InputInformation(props) {
             <Controller
                 {...register("car_type")}
                 control={control}
-                render={({ field }) => <Select 
+                render={({ field }) => <Select
+                errors={SelectHasError}
+                helpertext={errors['car_type']?.message}
+                 
                 {...field} 
                 options={options}
                 styles={{
