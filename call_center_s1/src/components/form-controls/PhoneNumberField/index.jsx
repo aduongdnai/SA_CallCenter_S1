@@ -38,7 +38,7 @@ function PhoneNumberField(props) {
                 size="small"
                 onChange={handleChange}
                 {...field}
-                value={value}
+                
             />
         )}
           

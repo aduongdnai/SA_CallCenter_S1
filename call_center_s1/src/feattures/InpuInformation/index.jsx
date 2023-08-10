@@ -46,15 +46,15 @@ function InputInformation(props) {
     })
     const form=useForm({
         defaultValues:{
-            phone_number:"0100000000",
+            phone_number:"",
             name:"",
             pickup_address:"",
-            car_type:""
+            car_type:"",
 
         },
         resolver:yupResolver(schema)
     })
-    const { register, handleSubmit, watch, formState: { errors,touchedFields } ,control} = form;
+    const { register, handleSubmit, watch, formState: { errors,touchedFields } ,control,reset} = form;
    
     //connect mqtt broker
     const [client, setClient] = useState(null)
@@ -64,7 +64,7 @@ function InputInformation(props) {
     const mqttConnect = (host, mqttOption) => {
         setConnectStatus('Connecting');
         setClient(mqtt.connect(host, mqttOption));
-        console.log(client);
+        
       };
       useEffect(() => {
         
@@ -75,6 +75,7 @@ function InputInformation(props) {
           });
           client.on('error', (err) => {
             console.error('Connection error: ', err);
+            console.log('err');
             client.end();
           });
           client.on('reconnect', () => {
@@ -98,7 +99,7 @@ function InputInformation(props) {
          * https://docs.emqx.com/en/enterprise/v4.4/advanced/auth.html#anonymous-login
          */
         username: 'emqx_test',
-        password: 'emqx_test',
+        password: 'emqx_test'
       }
       
       const mqttPublish = (context) => {
@@ -120,6 +121,7 @@ function InputInformation(props) {
         }
       }
       const onSubmit = (data) =>{ 
+        mqttConnect('ws://broker.emqx.io:8083/mqtt',initialConnectionOptions)
         const car_type=data.car_type
         data.car_type=car_type.value
         const curDate=new Date()
@@ -128,22 +130,37 @@ function InputInformation(props) {
         
         //const call=new CallDTO(data.name,data.phone_number,data.pickup_address,data.car_type,data.time)
         // callAPI.add(call)
-        mqttConnect('ws://broker.emqx.io:8083/mqtt',initialConnectionOptions)
         
+        
+        console.log(client);
+        console.log(connectStatus);
         const publishContent={
             topic:'testtopic/react',
             qos:0,
             payload: data.phone_number
           }
           setTimeout(mqttPublish, 1500,publishContent);
-          setTimeout(mqttDisconnect, 2000);
-        
+          
+        reset( {
+          phone_number:"",
+          name:"",
+          pickup_address:"",
+          car_type:"",
+
+      })
     }
     let SelectHasError=errors['car_type'] && touchedFields['car_type']
     return (
        
         <div>
-        <form style={{marginTop: '10px', width:'400px'}} onSubmit={handleSubmit(onSubmit)}> 
+        <form style={{marginTop: '10px', width:'400px'}} onSubmit={handleSubmit(onSubmit)} 
+        defaultValue={ {
+            phone_number:"",
+            name:"",
+            pickup_address:"",
+            car_type:"",
+
+        }}> 
             <PhoneNumberField  {...register("phone_number")}  label="Số Điện Thoại" form={form}></PhoneNumberField>
             <InputTextField {...register("name")}  label="Tên Khách Hàng" form={form}></InputTextField>
             <InputTextField {...register("pickup_address")}  label="Địa chỉ đón" form={form}></InputTextField>

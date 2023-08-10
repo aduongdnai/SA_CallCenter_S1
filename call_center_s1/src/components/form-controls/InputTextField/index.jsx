@@ -30,7 +30,7 @@ function InputTextField(props) {
                 variant='outlined'
                 size="small"
                 {...field}
-                value={value}
+                
             />
         )}
           
