@@ -26,7 +26,7 @@ InputInformation.propTypes = {
 };
 
 function InputInformation(props) {
-    const options = [
+    const vehicle_options = [
         { value: '1', label: 'Xe hơi' },
         { value: '2', label: 'Xe máy' },
         { value:'',   label:'None'}
@@ -58,53 +58,48 @@ function InputInformation(props) {
    
     //connect mqtt broker
     const [client, setClient] = useState(null)
-    const [isSubed, setIsSub] = useState(false)
-    const [payload, setPayload] = useState({})
-    const [connectStatus, setConnectStatus] = useState('Connect')
-    const mqttConnect = (host, mqttOption) => {
-        setConnectStatus('Connecting');
-        setClient(mqtt.connect(host, mqttOption));
-        
-      };
-      useEffect(() => {
-        
-        if (client) {
-           
-          client.on('connect', () => {
-            setConnectStatus('Connected');
-          });
-          client.on('error', (err) => {
-            console.error('Connection error: ', err);
-            console.log('err');
-            client.end();
-          });
-          client.on('reconnect', () => {
-            setConnectStatus('Reconnecting');
-          });
-          client.on('message', (topic, message) => {
-            const payload = { topic, message: message.toString() };
-            setPayload(payload);
-          });
-        }
-      }, [client]);
-      const initialConnectionOptions = {
-        // ws or wss
-        protocol: 'ws',
-        host: 'broker.emqx.io',
+    
+    useEffect(() => {
+      const mqttOptions = {
         clientId: 'emqx_react_' + Math.random().toString(16).substring(2, 8),
         // ws -> 8083; wss -> 8084
-        port: 8083,
+        
         /**
          * By default, EMQX allows clients to connect without authentication.
          * https://docs.emqx.com/en/enterprise/v4.4/advanced/auth.html#anonymous-login
          */
         username: 'emqx_test',
-        password: 'emqx_test'
-      }
+        password: 'emqx_test',
+        clean: true,
+        reconnectPeriod: 1000, // ms
+        connectTimeout: 30 * 1000, // ms
+      };
+  
+      const mqttClient = mqtt.connect('ws://broker.emqx.io:8083/mqtt', mqttOptions);
+  
+      mqttClient.on('connect', () => {
+        console.log('S1 connected to MQTT');
+        mqttClient.subscribe('callcenter/exactAddress', { qos: 0 });
+      });
+  
+      mqttClient.on('message', (topic, message) => {
+        console.log(`Received message in S2 from topic ${topic}: ${message.toString()}`);
+      });
+  
+      setClient(mqttClient);
+  
+      return () => {
+        mqttClient.end();
+      };
+    }, []);
+     
+      
+     
+      
       
       const mqttPublish = (context) => {
+        
         if (client) {
-        console.log(context);
           const { topic, qos, payload } = context;
           client.publish(topic, payload, { qos }, error => {
             if (error) {
@@ -113,15 +108,9 @@ function InputInformation(props) {
           });
         }
       }
-      const mqttDisconnect = () => {
-        if (client) {
-          client.end(() => {
-            setConnectStatus('Connect');
-          });
-        }
-      }
+     
       const onSubmit = (data) =>{ 
-        mqttConnect('ws://broker.emqx.io:8083/mqtt',initialConnectionOptions)
+        
         const car_type=data.car_type
         data.car_type=car_type.value
         const curDate=new Date()
@@ -132,14 +121,17 @@ function InputInformation(props) {
         // callAPI.add(call)
         
         
-        console.log(client);
-        console.log(connectStatus);
+        
+        
         const publishContent={
-            topic:'testtopic/react',
+            topic:'callcenter/checkingAddress',
             qos:0,
-            payload: data.phone_number
+            payload: JSON.stringify({
+              phone_number:data.phone_number,
+              pickup_address:data.pickup_address
+            })
           }
-          setTimeout(mqttPublish, 1500,publishContent);
+        setTimeout(mqttPublish, 500,publishContent);
           
         reset( {
           phone_number:"",
@@ -173,7 +165,7 @@ function InputInformation(props) {
                 helpertext={errors['car_type']?.message}
                  
                 {...field} 
-                options={options}
+                options={vehicle_options}
                 styles={{
                     control: (baseStyles, state) => ({
                       ...baseStyles,
