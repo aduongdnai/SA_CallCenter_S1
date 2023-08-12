@@ -21,11 +21,11 @@ class CallDTO  {
     }
 }
 
-InputInformation.propTypes = {
+CallCenterS1.propTypes = {
    
 };
 
-function InputInformation(props) {
+function CallCenterS1(props) {
     const vehicle_options = [
         { value: '1', label: 'Xe hơi' },
         { value: '2', label: 'Xe máy' },
@@ -108,8 +108,8 @@ function InputInformation(props) {
           });
         }
       }
-     
-      const onSubmit = (data) =>{ 
+    
+      const onSubmit = async (data) =>{ 
         
         const car_type=data.car_type
         data.car_type=car_type.value
@@ -119,19 +119,21 @@ function InputInformation(props) {
         
         //const call=new CallDTO(data.name,data.phone_number,data.pickup_address,data.car_type,data.time)
         // callAPI.add(call)
+        const result=await callAPI.isAddressExist(data.phone_number,data.pickup_address)
         
         
+        if(!result.data){
+            const publishContent={
+              topic:'callcenter/checkingAddress',
+              qos:0,
+              payload: JSON.stringify({
+                phone_number:data.phone_number,
+                pickup_address:data.pickup_address
+              })
+            }
+          setTimeout(mqttPublish, 500,publishContent);
+        }
         
-        
-        const publishContent={
-            topic:'callcenter/checkingAddress',
-            qos:0,
-            payload: JSON.stringify({
-              phone_number:data.phone_number,
-              pickup_address:data.pickup_address
-            })
-          }
-        setTimeout(mqttPublish, 500,publishContent);
           
         reset( {
           phone_number:"",
@@ -189,4 +191,4 @@ function InputInformation(props) {
     );
 }
 
-export default InputInformation;
+export default CallCenterS1;

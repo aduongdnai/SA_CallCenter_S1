@@ -12,7 +12,16 @@ CallCenterS2.propTypes = {
 
 function CallCenterS2(props) {
       //mqtt connect attribute and function
-     
+      const reverseAddressToGeoCode=(address)=>{
+           const result= mapAPI.adressToGeoCode(address)
+           if(result)
+           {
+            return result
+           }
+           else{
+            return null
+           }
+      }
       const initialConnectionOptions = {
             // ws or wss
             
@@ -56,7 +65,10 @@ function CallCenterS2(props) {
             });
         
             mqttClient.on('message', (topic, message) => {
-              console.log(`Received message in Component A from topic ${topic}: ${message.toString()}`);
+              console.log(`Received message in S1 from topic ${topic}: ${message.toString()}`);
+              const mess=JSON.parse(message)
+              const result=reverseAddressToGeoCode(mess.pickup_address)
+              console.log(result);
             });
         
             setClient(mqttClient);

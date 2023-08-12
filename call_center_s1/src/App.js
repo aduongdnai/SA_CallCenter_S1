@@ -1,5 +1,5 @@
 import './App.css';
-import InputInformation from './feattures/InpuInformation';
+import CallCenterS1 from './feattures/CallCenterS1';
 import ResponsiveAppBar from './components/header';
 import { Route, Routes, BrowserRouter} from 'react-router-dom'
 import React from 'react';
@@ -26,7 +26,7 @@ function App() {
         
           <Routes>
             
-            <Route path="/" Component={InputInformation}/>
+            <Route path="/" Component={CallCenterS1}/>
             <Route path="/S2" Component={CallCenterS2}/>
             
             

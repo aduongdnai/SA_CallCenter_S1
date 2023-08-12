@@ -20,6 +20,10 @@ const callAPI={
     remove(id){
         const url=`/calls/${id}`
         return axiosClient.delete(url)
+    },
+    isAddressExist(phone_number,pickup_address){
+        const url=`/calls/find?phone_number=${phone_number}&pickup_address=${pickup_address}`
+        return axiosClient.get(url)
     }
 }
 export default callAPI
