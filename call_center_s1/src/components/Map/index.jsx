@@ -1,28 +1,49 @@
 import React, { useState } from 'react';
 
-import ReactMapGL from '@goongmaps/goong-map-react';
+import ReactMapGL, { Marker } from '@goongmaps/goong-map-react';
 import { MAP_API_KEY } from '../../api/mapAxiosClient';
-const Map = ( props ) => {
+import Pin from '../Pin/pin'
+import PropTypes from 'prop-types';
+Map.propTypes = {
+  viewport: PropTypes.object.isRequired,
+  setViewport:PropTypes.func.isRequired
+};
+function Map  ( props )  {
       const map_api_key=MAP_API_KEY()
+      const {viewport,setViewport}=props
       
-      const [viewport, setViewport] = useState({
-        latitude: 18.7616,
-        longitude: 105.6474,
-        zoom: 7,
-        bearing: 0,
-        pitch: 0
+      
+      const [marker, setMarker] = useState({
+        latitude:  viewport.latitude,
+        longitude: viewport.longitude,
       });
-      
+      const handleSetViewPort=(values)=>{
+        console.log('Todo Form: ', viewport);
+        const {setViewport}=props
+        if(setViewport){
+          setViewport(values)
+        }
+        
+    }
       return (
         
               <ReactMapGL
               {...viewport}
-              width="100vw"
-              height="100vh"
-              mapStyle="https://tiles.goong.io/assets/goong_map_dark.json"
-              onViewportChange={setViewport}
+              width="710px"
+              height="450px"
+              onViewportChange={handleSetViewPort}
               goongApiAccessToken={map_api_key}
-              />
+              
+              >
+                <Marker
+                latitude={marker.latitude}
+                longitude={marker.longitude}
+                offsetTop={-20}
+                offsetLeft={-10}  
+                >
+                  <Pin size={20} />
+                </Marker>
+              </ReactMapGL>
             
         
       

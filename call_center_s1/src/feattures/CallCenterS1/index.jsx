@@ -11,15 +11,7 @@ import callAPI from '../../api/callAPI';
 import * as mqtt from 'mqtt'
 
 
-class CallDTO  {
-    constructor(name,phone_number,address,car_type,time){
-        this.name=name;
-        this.phone_number=phone_number;
-        this.pickup_address=address;
-        this.car_type=car_type;
-        this.time=time;
-    }
-}
+
 
 CallCenterS1.propTypes = {
    
@@ -112,17 +104,22 @@ function CallCenterS1(props) {
       const onSubmit = async (data) =>{ 
         
         const car_type=data.car_type
-        data.car_type=car_type.value
+        data.car_type=car_type.value      
         const curDate=new Date()
         data.time=curDate.toISOString()
+        data.isComplete=false
+        data.lat=0
+        data.lng=0
         console.log(data);
         
-        //const call=new CallDTO(data.name,data.phone_number,data.pickup_address,data.car_type,data.time)
-        // callAPI.add(call)
+        
         const result=await callAPI.isAddressExist(data.phone_number,data.pickup_address)
         
         
         if(!result.data){
+         
+          
+          
             const publishContent={
               topic:'callcenter/checkingAddress',
               qos:0,
@@ -133,7 +130,11 @@ function CallCenterS1(props) {
             }
           setTimeout(mqttPublish, 500,publishContent);
         }
-        
+        else{
+           //gan lai is Complete de khong vao 
+           data.isComplete=true
+        }
+        callAPI.add(data)
           
         reset( {
           phone_number:"",

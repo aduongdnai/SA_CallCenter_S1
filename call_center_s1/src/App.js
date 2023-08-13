@@ -7,6 +7,7 @@ import React from 'react';
 import callAPI from './api/callAPI';
 import { useEffect } from 'react';
 import CallCenterS2 from './feattures/CallCenterS2';
+import NewAddressItem from './feattures/CallCenterS2/components/newAddressItem';
 
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
             
             <Route path="/" Component={CallCenterS1}/>
             <Route path="/S2" Component={CallCenterS2}/>
-            
+            <Route path='/S2/NewAddressItem' Component={NewAddressItem}></Route>
             
           </Routes>
           

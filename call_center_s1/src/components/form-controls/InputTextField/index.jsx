@@ -7,16 +7,22 @@ InputTextField.propTypes = {
     name: PropTypes.string.isRequired,
     label: PropTypes.string,
     disabled: PropTypes.bool,
+    defaultValues: PropTypes.string
 };
 
 function InputTextField(props) {
-    const {form,name,label,disabled}=props
-    const {value,setValue}=useState()
+    const {form,name,label,disabled,defaultValues}=props
+    // const [value,setValue]=useState()
+    console.log('default',defaultValues);
     const { formState}=form;
     
     let hasError=formState.errors[name] && formState.touchedFields[name]
+    // const handleInputChange = (event) => {
+    //     setValue(event.target.value);
+    //   };
     return (
-        <Controller name={name}
+        <Controller 
+        name={name}
          control={form.control} 
          
          render = {({ field})=> (
@@ -24,12 +30,16 @@ function InputTextField(props) {
                 style={{marginTop: '10px'}}
                 error={hasError}
                 label={label} 
-                disabled={disabled}
+                
                 helperText={formState.errors[name]?.message}
                 fullWidth
                 variant='outlined'
                 size="small"
                 {...field}
+                defaultValue='cc'
+                
+               
+                
                 
             />
         )}

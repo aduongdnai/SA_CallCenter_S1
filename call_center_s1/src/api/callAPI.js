@@ -13,10 +13,6 @@ const callAPI={
         const url=`/calls/add`
         return axiosClient.post(url, data)
     },
-    update(data){
-        const url=`/calls/${data.id}`
-        return axiosClient.patch(url, data)
-    },
     remove(id){
         const url=`/calls/${id}`
         return axiosClient.delete(url)
@@ -24,6 +20,15 @@ const callAPI={
     isAddressExist(phone_number,pickup_address){
         const url=`/calls/find?phone_number=${phone_number}&pickup_address=${pickup_address}`
         return axiosClient.get(url)
+    },
+    findInCompleteCall(){
+        const url=`/calls/find/incomplete`
+        return axiosClient.get(url)
+    },
+    updateCall(id,data){
+        console.log(id,data);
+        const url=`calls/update/${id}`
+        return axiosClient.put(url,data)
     }
 }
 export default callAPI
