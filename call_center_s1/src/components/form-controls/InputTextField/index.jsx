@@ -13,7 +13,6 @@ InputTextField.propTypes = {
 function InputTextField(props) {
     const {form,name,label,disabled,defaultValues}=props
     // const [value,setValue]=useState()
-    console.log('default',defaultValues);
     const { formState}=form;
     
     let hasError=formState.errors[name] && formState.touchedFields[name]

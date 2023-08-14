@@ -29,6 +29,10 @@ const callAPI={
         console.log(id,data);
         const url=`calls/update/${id}`
         return axiosClient.put(url,data)
+    },
+    findGeocode(phone_number,pickup_address){
+        const url=`/calls/find/geocode?phone_number=${phone_number}&pickup_address=${pickup_address}`
+        return axiosClient.get(url)
     }
 }
 export default callAPI

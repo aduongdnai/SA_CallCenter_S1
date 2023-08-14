@@ -115,9 +115,9 @@ function CallCenterS1(props) {
         
         const result=await callAPI.isAddressExist(data.phone_number,data.pickup_address)
         
-        
+        console.log(result);
         if(!result.data){
-         
+          console.log('not exist');
           
           
             const publishContent={
@@ -132,7 +132,22 @@ function CallCenterS1(props) {
         }
         else{
            //gan lai is Complete de khong vao 
+           console.log('exist');
            data.isComplete=true
+           const result=await callAPI.findGeocode(data.phone_number,data.pickup_address)
+           console.log("cc",result);
+           const lat=parseFloat(result.data.lat)
+           const lng=parseFloat(result.data.lng)
+           console.log(typeof(lat));
+           data.lat=lat
+           data.lng=lng
+           console.log(data);
+           const context={
+            topic:'callcenter/publishCall',
+            payload:JSON.stringify(data),
+            qos:0
+           }
+           mqttPublish(context)
         }
         callAPI.add(data)
           
