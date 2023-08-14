@@ -5,14 +5,17 @@ import { MAP_API_KEY } from '../../api/mapAxiosClient';
 import Pin from '../Pin/pin'
 import PropTypes from 'prop-types';
 Map.propTypes = {
-  viewport: PropTypes.object.isRequired,
-  setViewport:PropTypes.func.isRequired
+  
 };
 function Map  ( props )  {
       const map_api_key=MAP_API_KEY()
-      const {viewport,setViewport}=props
-      
-      
+      const [viewport, setViewport] = useState({
+        latitude:   10.80158,
+        longitude: 106.66690,
+        zoom: 14,
+        bearing: 0,
+        pitch: 0
+    });
       const [marker, setMarker] = useState({
         latitude:  viewport.latitude,
         longitude: viewport.longitude,

@@ -82,15 +82,15 @@ function CallCenterS2(props) {
       return (
           <Box sx={{ flexGrow: 1, margin: 2 }}>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            {/* <Grid item xs={3}>
               <Card>
                 <CardContent>
-                 
+                 <Map></Map>
                 </CardContent>
                 
               </Card>
-            </Grid>
-            <Grid item xs={6}>
+            </Grid> */}
+            <Grid item xs={12}>
                 
                 <Card sx={{height:500}}>
                 <CardHeader title='New Address List'>

@@ -84,7 +84,8 @@ function NewAddressItem(props) {
         const data={
           lat:marker.latitude,
           lng:marker.longitude,
-          pickup_address:valueTextField
+          pickup_address:valueTextField,
+          isComplete:true
         }
         const a=await callAPI.updateCall(curCall._id,data)
         const context={
@@ -94,6 +95,7 @@ function NewAddressItem(props) {
             _id:curCall._id
           })
         }
+        
         mqttPublish(context)
     }
     const Back=()=>{

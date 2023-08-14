@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Select from 'react-select'
 import PhoneNumberField from '../../components/form-controls/PhoneNumberField';
 import InputTextField from '../../components/form-controls/InputTextField';
-import { Button} from '@mui/material';
+import { Button,Box, Grid, Card,CardHeader,CardContent, Table, TableRow, TableCell} from '@mui/material';
 import {useForm, Controller} from 'react-hook-form'
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
@@ -146,47 +146,59 @@ function CallCenterS1(props) {
     }
     let SelectHasError=errors['car_type'] && touchedFields['car_type']
     return (
-       
-        <div>
-        <form style={{marginTop: '10px', width:'400px'}} onSubmit={handleSubmit(onSubmit)} 
-        defaultValue={ {
-            phone_number:"",
-            name:"",
-            pickup_address:"",
-            car_type:"",
+      <Box>
+          <Grid container spacing={2}>
+          <Grid item xs={12} >
+          <Card sx={{height:500}}>
+              <Table>
+                <TableRow>
+                  <TableCell align='center'>
+                  
+                  <CardHeader title='Book car'>
+                    
+                  </CardHeader>
+                  <CardContent align='center'>
 
-        }}> 
-            <PhoneNumberField  {...register("phone_number")}  label="Số Điện Thoại" form={form}></PhoneNumberField>
-            <InputTextField {...register("name")}  label="Tên Khách Hàng" form={form}></InputTextField>
-            <InputTextField {...register("pickup_address")}  label="Địa chỉ đón" form={form}></InputTextField>
-            
-            <Controller
-                {...register("car_type")}
-                control={control}
-                render={({ field }) => <Select
-                errors={SelectHasError}
-                helpertext={errors['car_type']?.message}
-                 
-                {...field} 
-                options={vehicle_options}
-                styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      marginTop:'10px'
-                    }),
-                  }} 
-                />}
-            />
-                
-                
-           
-            <Button type='submit' variant="outlined" style={{marginTop:'10px'}}>Submit</Button>
-        </form>
-       {/* <TextField  id="outlined-basic" label="Số Điện Thoại" variant="outlined">  </TextField><br/>
-       <TextField  id="outlined-basic" label="Tên Khách Hàng" variant="outlined"></TextField><br/>
-       <TextField  id="outlined-basic" label="Địa chỉ đón" variant="outlined"></TextField><br/>
-       <TextField  id="outlined-basic" label="Địa chỉ đến" variant="outlined"></TextField> */}
-       </div>
+                    <form style={{marginTop: '10px', width:'400px'}} onSubmit={handleSubmit(onSubmit)} 
+                    defaultValue={ {
+                        phone_number:"",
+                        name:"",
+                        pickup_address:"",
+                        car_type:"",
+
+                    }}> 
+                        <PhoneNumberField  {...register("phone_number")}  label="Số Điện Thoại" form={form}></PhoneNumberField>
+                        <InputTextField {...register("name")}  label="Tên Khách Hàng" form={form}></InputTextField>
+                        <InputTextField {...register("pickup_address")}  label="Địa chỉ đón" form={form}></InputTextField>
+                        
+                        <Controller
+                            {...register("car_type")}
+                            control={control}
+                            render={({ field }) => <Select
+                            errors={SelectHasError}
+                            helpertext={errors['car_type']?.message}
+                            
+                            {...field} 
+                            options={vehicle_options}
+                            styles={{
+                                control: (baseStyles, state) => ({
+                                  ...baseStyles,
+                                  marginTop:'10px'
+                                }),
+                              }} 
+                            />}
+                        />
+                        <Button type='submit' variant="outlined" style={{marginTop:'10px'}}>Submit</Button>
+                    </form>
+                    </CardContent>
+                  </TableCell>
+                </TableRow>
+              </Table>             
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+       
         
         
     );
