@@ -35,7 +35,7 @@ function InputTextField(props) {
                 variant='outlined'
                 size="small"
                 {...field}
-                defaultValue='cc'
+                
                 
                
                 
