@@ -8,6 +8,9 @@ import callAPI from './api/callAPI';
 import { useEffect } from 'react';
 import CallCenterS2 from './feattures/CallCenterS2';
 import NewAddressItem from './feattures/CallCenterS2/components/newAddressItem';
+import { Box, Stack } from '@mui/material';
+import SideBar from './components/SideBar';
+import CallCenterS3 from './feattures/CallCenterS3';
 
 
 function App() {
@@ -18,23 +21,23 @@ function App() {
   //   }
   //   fetchCalls()
   // })
-  
 
-  
   return (
     <BrowserRouter>
         <ResponsiveAppBar></ResponsiveAppBar>
-        
-          <Routes>
-            
-            <Route path="/" Component={CallCenterS1}/>
-            <Route path="/S2" Component={CallCenterS2}/>
-            <Route path='/S2/NewAddressItem' Component={NewAddressItem}></Route>
-            
-          </Routes>
-          
-        
-          
+        <Stack spacing={3} direction="row">
+          <Box sx={{py: 3, px: 1}} className="leftPannel" > 
+            <SideBar/>
+          </Box>
+          <Box className="rightPannel">
+            <Routes>
+              <Route path="/" Component={CallCenterS1}/>
+              <Route path="/S2" Component={CallCenterS2}/>
+              <Route path='/S2/NewAddressItem' Component={NewAddressItem}></Route>
+              <Route path='/S3' Component={CallCenterS3}></Route>
+            </Routes>
+          </Box>
+        </Stack>
         
     </BrowserRouter>
   );

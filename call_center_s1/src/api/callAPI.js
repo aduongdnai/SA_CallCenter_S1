@@ -33,6 +33,10 @@ const callAPI={
     findGeocode(phone_number,pickup_address){
         const url=`/calls/find/geocode?phone_number=${phone_number}&pickup_address=${pickup_address}`
         return axiosClient.get(url)
-    }
+    },
+    getAllDrivers(){
+        const url=`/drivers/`
+        return axiosClient.get(url)  
+    },
 }
 export default callAPI
