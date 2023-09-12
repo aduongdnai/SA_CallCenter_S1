@@ -4,8 +4,8 @@ const mapClient=axios.create({
     baseURL:'https://maps.googleapis.com/maps/api',
     
 })
-const API_KEY=()=> {return 'AIzaSyDbClsQyJVztvdkXbZgDJBlQFY30BT7zZ8'}
-const MAP_API_KEY=()=> {return 'gOaJEchgjoBByaWaik61iQ4uZsRZYC5BqrzOlzNn'}
+const API_KEY=()=> {return 'AIzaSyAVpiy92v062RpDI7B5-fIz7Z8DSXsuUfY'}
+
 // Add a request interceptor
 mapClient.interceptors.request.use(function (config) {
     // Do something before request is sent
