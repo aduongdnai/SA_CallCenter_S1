@@ -25,4 +25,4 @@ mapClient.interceptors.response.use(function (response) {
     // Do something with response error
     return Promise.reject(error);
   });
-export  {mapClient,API_KEY,MAP_API_KEY}
+export  {mapClient,API_KEY}

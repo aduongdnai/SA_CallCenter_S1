@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useCallback } from 'react';
 import PropTypes from 'prop-types';
-import InputTextField from '../../../../components/form-controls/InputTextField';
 import { useForm } from 'react-hook-form';
 import * as yup from "yup"
 import { Card,Box,Grid,CardContent, Button, CardHeader, TextField } from '@mui/material';
-import Map from '../../../../components/Map';
 import { useLocation,useNavigate } from 'react-router-dom';
 //import mapAPI from '../../../../api/mapApi';
 import ReactMapGL,{FlyToInterpolator,Marker} from '@goongmaps/goong-map-react';
@@ -15,8 +13,9 @@ import callAPI from '../../../../api/callAPI';
 import userAPI from '../../../../api/userApi';
 import * as mqtt from 'mqtt'
 import { availablePlugins } from '../../../../plugins/pluginConfig';
-import { convertFromCallToBooking } from '../../../../utils/util';
 import CallAdapter from '../../../../utils/CallAdapter';
+import controlPanel from '../../../../components/control-panel';
+import './style.css'
 
 
 NewAddressItem.propTypes = {
@@ -248,8 +247,39 @@ function NewAddressItem(props) {
      else{
        console.log("Plugin not found or failed to load.");
      }
- 
+    
  };
+    const onMarkerStartDragEnd=useCallback(event => {
+      logEvents(_events => ({..._events, onDragEnd: event.lngLat}));
+      fetchAddressFromGeocode( event.lngLat[0],event.lngLat[1],"pickup")
+      setMarker({
+        longitude: event.lngLat[0],
+        latitude: event.lngLat[1]
+      });
+    }, []);
+    const [events,logEvents]=useState()
+    const onMarkerEndDragEnd= useCallback(event => {
+      logEvents(_events => ({..._events, onDragEnd: event.lngLat}));
+      fetchAddressFromGeocode( event.lngLat[0],event.lngLat[1],"dropoff")
+      setMarkerDropOff({
+        longitude: event.lngLat[0],
+        latitude: event.lngLat[1]
+      });
+    }, []);
+    const fetchAddressFromGeocode=async (lng, lat, addresstype)=>{
+      const result= await mapAPI.geoCodeToAddress(lat,lng)
+      console.log("réult",result);
+      switch(addresstype){
+        case "pickup":
+          setValueTextField(result.results[0].formatted_address)
+          break;
+        case "dropoff":
+          setDropOffAddress(result.results[0].formatted_address)
+          break;
+        default:
+          break;
+      }
+    }
     return (
         <Box sx={{ flexGrow: 1, margin: 2}}>
           <Grid container spacing={2}>
@@ -257,19 +287,20 @@ function NewAddressItem(props) {
               <Card>
                 <CardContent>
                 <ReactMapGL
-              {...viewport}
-              width="460px"
-              height="450px"
-              onViewportChange={setViewport}
-              goongApiAccessToken={map_api_key}
-              
+                {...viewport}
+                width="460px"
+                height="450px"
+                onViewportChange={setViewport}
+                goongApiAccessToken={map_api_key}
+               
               >
                 <Marker
                 latitude={marker.latitude}
                 longitude={marker.longitude}
                 offsetTop={-20}
                 offsetLeft={-10}
-                  
+                draggable
+                onDragEnd={onMarkerStartDragEnd}
                 >
                   <Pin size={20} />
                 </Marker>
@@ -278,11 +309,13 @@ function NewAddressItem(props) {
                 longitude={markerDropOff.longitude}
                 offsetTop={-20}
                 offsetLeft={-10}
-                  
+                draggable
+                onDragEnd={onMarkerEndDragEnd}
                 >
                   <Pin  size={20} />
                 </Marker>
               </ReactMapGL>
+              <controlPanel events={events}></controlPanel>
                 </CardContent>
                 
               </Card>
