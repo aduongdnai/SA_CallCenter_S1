@@ -10,7 +10,8 @@ import * as yup from "yup"
 import callAPI from '../../api/callAPI';
 import userAPI from '../../api/userApi';
 import * as mqtt from 'mqtt'
-import {formatDate,convertFromCallToBooking} from '../../utils/util'
+import {formatDate} from '../../utils/util'
+import CallAdapter from '../../utils/CallAdapter';
 
 
 
@@ -157,11 +158,13 @@ function CallCenterS1(props) {
             latitude:data.lat,
             longitude:data.lng
            })
-           const booking=convertFromCallToBooking(data)
+           const callAdapter=new CallAdapter(data)
+           const bookingData=callAdapter.convertToBooking()
+           console.log("Boooking",bookingData);
            
            const context={
             topic:'KTPM/MQTT_SENDING_BOOKING_TOPIC',
-            payload:JSON.stringify(booking),
+            payload:JSON.stringify(bookingData),
             qos:0
            }
            mqttPublish(context)

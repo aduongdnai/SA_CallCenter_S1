@@ -16,6 +16,7 @@ import userAPI from '../../../../api/userApi';
 import * as mqtt from 'mqtt'
 import { availablePlugins } from '../../../../plugins/pluginConfig';
 import { convertFromCallToBooking } from '../../../../utils/util';
+import CallAdapter from '../../../../utils/CallAdapter';
 
 
 NewAddressItem.propTypes = {
@@ -103,12 +104,14 @@ function NewAddressItem(props) {
     const {register,formState,handleSubmit}=form
     const onSubmit=async ()=>{
         const data={
+          ...curCall,
           lat:marker.latitude,
           lng:marker.longitude,
           pickup_address:valueTextField,
           dropoff_address:dropOffAddress,
           isComplete:true
         }
+        console.log("data",data);
         const a=await callAPI.updateCall(curCall._id,data)
         const updateUserInformation= await userAPI.update({
           id:"guest75963396",
@@ -120,7 +123,9 @@ function NewAddressItem(props) {
           longitude:data.lng
          })
          console.log(updateUserInformation);
-        const booking=convertFromCallToBooking(curCall)
+         const callAdapter=new CallAdapter(data)
+        const booking=callAdapter.convertToBooking()
+        console.log("Boooking",booking);
         const context={
           topic:'KTPM/MQTT_SENDING_BOOKING_TOPIC',
           qos:0,
