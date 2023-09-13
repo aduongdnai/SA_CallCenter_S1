@@ -30,6 +30,7 @@ function NewAddressItem(props) {
           const {default: plugin} = await import(`../../../../plugins/${selectedPlugin.directory}/mapApi`);
           
           // Now you can use the mapAPI functions
+          console.log(plugin);
           return plugin
       } else {
           console.log(`Plugin "${selectedPluginName}" not found.`);
@@ -132,6 +133,7 @@ function NewAddressItem(props) {
         }
         
         mqttPublish(context)
+        alert("Đặt xe thành công")
     }
     const Back=()=>{
         navigate(-1)
@@ -249,25 +251,32 @@ function NewAddressItem(props) {
      }
     
  };
-    const onMarkerStartDragEnd=useCallback(event => {
-      logEvents(_events => ({..._events, onDragEnd: event.lngLat}));
-      fetchAddressFromGeocode( event.lngLat[0],event.lngLat[1],"pickup")
-      setMarker({
-        longitude: event.lngLat[0],
-        latitude: event.lngLat[1]
-      });
-    }, []);
-    const [events,logEvents]=useState()
-    const onMarkerEndDragEnd= useCallback(event => {
-      logEvents(_events => ({..._events, onDragEnd: event.lngLat}));
-      fetchAddressFromGeocode( event.lngLat[0],event.lngLat[1],"dropoff")
-      setMarkerDropOff({
-        longitude: event.lngLat[0],
-        latitude: event.lngLat[1]
-      });
-    }, []);
-    const fetchAddressFromGeocode=async (lng, lat, addresstype)=>{
+ const [events,logEvents]=useState()
+  const onMarkerStartDragEnd=useCallback(event => {
+    logEvents(_events => ({..._events, onDragEnd: event.lngLat}));
+    fetchAddressFromGeocode( event.lngLat[0],event.lngLat[1],"pickup")
+    setMarker({
+      longitude: event.lngLat[0],
+      latitude: event.lngLat[1]
+    });
+  }, []);
+  
+  const onMarkerEndDragEnd= useCallback(event => {
+    logEvents(_events => ({..._events, onDragEnd: event.lngLat}));
+    fetchAddressFromGeocode( event.lngLat[0],event.lngLat[1],"dropoff")
+    setMarkerDropOff({
+      longitude: event.lngLat[0],
+      latitude: event.lngLat[1]
+    });
+  }, []);
+  const fetchAddressFromGeocode=async (lng, lat, addresstype)=>{
+      const mapAPI = await loadMapPlugin(selectedPluginName);
+      setMapAPI(mapAPI);
+    if (mapAPI && mapAPI.geoCodeToAddress) {
+      
+      // Access the property or call the method
       const result= await mapAPI.geoCodeToAddress(lat,lng)
+
       console.log("réult",result);
       switch(addresstype){
         case "pickup":
@@ -279,7 +288,10 @@ function NewAddressItem(props) {
         default:
           break;
       }
+    } else {
+      console.log("Failed");
     }
+  }
     return (
         <Box sx={{ flexGrow: 1, margin: 2}}>
           <Grid container spacing={2}>
